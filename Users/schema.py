@@ -35,12 +35,13 @@ class Query(graphene.ObjectType):
   Users = graphene.List(UsersType)
   Skills = graphene.List(SkillsType)
 
+# Relay Working
   viewer = graphene.relay.Node.Field(UsersTypeNode)
   org = graphene.relay.Node.Field(SkillsTypeNOde)
   all_users = DjangoFilterConnectionField(UsersTypeNode)
   all_orgs = DjangoFilterConnectionField(SkillsTypeNOde)
-    # def resolve_Users(root,info):
-    #     return Users.objects.all()
+    
+    
   def resolve_Users(root,info):
         return Users.objects.all()
     
