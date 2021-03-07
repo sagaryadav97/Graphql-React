@@ -1,23 +1,51 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Users
+from graphene_django.filter import DjangoFilterConnectionField
+from .models import Users, Skills
 
 
 class UsersType(DjangoObjectType):
     class Meta:
         model = Users
-        fields = ('id','name','email','skills_set')
+        fields = ('id','name','email','skillt')
+
+class SkillsType(DjangoObjectType):
+    class Meta:
+        model = Skills  
+        fields = ('id','skills')
+
+class UsersTypeNode(DjangoObjectType):
+    class Meta:
+        model = Users
+        filter_fields = {
+            'id',
+        }
+        interfaces = (graphene.relay.Node, )
+
+class SkillsTypeNOde(DjangoObjectType):
+    class Meta:
+        model = Skills  
+        filter_fields = {
+            'id',
+        }
+        interfaces = (graphene.relay.Node, )
+        
 
 class Query(graphene.ObjectType):
-    all_users = graphene.Field(UsersType,id=graphene.Int())
-    Users = graphene.List(UsersType)
-    
-    def resolve_Users(root,info):
+  Users = graphene.List(UsersType)
+  Skills = graphene.List(SkillsType)
+
+  viewer = graphene.relay.Node.Field(UsersTypeNode)
+  org = graphene.relay.Node.Field(SkillsTypeNOde)
+  all_users = DjangoFilterConnectionField(UsersTypeNode)
+  all_orgs = DjangoFilterConnectionField(SkillsTypeNOde)
+    # def resolve_Users(root,info):
+    #     return Users.objects.all()
+  def resolve_Users(root,info):
         return Users.objects.all()
     
-    def resolve_all_users(root,info,id):
-        return Users.objects.get(pk=id)
-    
+  def resolve_Skills(root,info):
+        return Skills.objects.all()
         
 class CreateUsers(graphene.Mutation):
     class Arguments:
